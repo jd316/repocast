@@ -1,0 +1,54 @@
+# repocast walkthrough config — a narrated video of your project.
+# All file/cwd paths are relative to THIS file's directory.
+# Render:  repocast render examples/walkthrough.yaml
+# Validate: repocast validate examples/walkthrough.yaml
+
+output: walkthrough.mp4          # written next to this config
+size: [1920, 1080]               # match your screen / target upload resolution
+
+tts:
+  provider: gemini               # gemini | none  (none = silent video, use your own voice)
+  voice: Charon                  # Charon | Orus | Iapetus | Algenib  (run `repocast voices` to pick)
+  model: gemini-3.1-flash-tts-preview   # keep this — the 2.5 TTS models silently drop some lines
+  style: "Read this aloud in a clear, natural voice, professional and measured. Do not add any words: "
+
+segments:
+  # 1) Walk the design doc, section by section. Anchors are the rendered markdown
+  #    heading IDs (lowercase, spaces->hyphens). `repocast render` errors loudly
+  #    on a wrong anchor instead of silently skipping it.
+  - doc:
+      name: Design document
+      file: ../path/to/your/project/DESIGN.md
+      steps:
+        - {anchor: architecture,   intro: "Let's start with the design.", say: "The system is layered: HTTP, a service layer, and a storage layer."}
+        - {anchor: the-atomic-gate, say: "The core is a single atomic update — check and deduct in one statement, so concurrency can't oversell."}
+
+  # 2) Run real commands and film their real output (rendered as a terminal — no
+  #    terminal emulator needed). `say` is spoken while the command's output holds.
+  - terminal:
+      name: Tests & demo
+      cwd: ../path/to/your/project
+      title: "myproject — make"
+      steps:
+        - {run: ["make", "test"], say: "The full test suite — green, with coverage."}
+        - {run: ["make", "demo"], env: {CI: "1"}, say: "A scripted end-to-end walkthrough."}
+
+  # 3) Drive the live app in a real browser. `start` launches it; actions are a
+  #    small DSL: say / click / fill(+value) / wait_for(+timeout) / press / eval /
+  #    goto / sleep. `zoom` fills a 1080p frame with a centred web app.
+  - app:
+      name: Live app
+      cwd: ../path/to/your/project
+      start: ["make", "run"]
+      env: {}
+      url: "http://127.0.0.1:8000"
+      ready_path: /health
+      zoom: 1.4
+      actions:
+        - {say: "And here it is running for real."}
+        - {click: '#some-button'}
+        - {fill: '#some-input', value: "hello"}
+        - {say: "Submitting a request…"}
+        - {click: '#submit'}
+        - {wait_for: '.result', timeout: 60000}
+        - {say: "…and the result comes back."}

@@ -1,0 +1,63 @@
+# Real worked example — the config that produces the Terrabase metering walkthrough.
+# Paths point at the sibling ../../Terrabase Assignment/terrabase-metering repo.
+# This is the reference the README's demo was generated from.
+output: terrabase-demo.mp4
+size: [1920, 1080]
+
+tts:
+  provider: gemini
+  voice: Charon
+  model: gemini-3.1-flash-tts-preview
+  style: "Read this aloud in a clear, natural Indian English male accent — professional and measured, like a senior engineer walking through their own design. Do not add any words: "
+
+_proj: &proj "../../Terrabase Assignment/terrabase-metering"
+
+segments:
+  - doc:
+      name: Design document
+      file: "../../Terrabase Assignment/terrabase-metering/DESIGN.md"
+      steps:
+        - {anchor: overview, intro: "This is an AI usage metering and quota service. Start with the design, then the tests and demo, then the live model.", say: "The hard problem: you can't know a request's true cost until after the model has run."}
+        - {anchor: architecture, say: "Layered on purpose — routers do HTTP, a service layer owns metering and quota, and generation sits behind a Protocol so mock and real models are swappable."}
+        - {anchor: credit-model, say: "Credits are prompt plus weighted completion tokens, times a per-user multiplier, rounded up. Integers and Decimal — never floats, because this is billing."}
+        - {anchor: quota-model-reserve-settle, say: "The core idea: reserve the worst case before generating, settle the truth after, and refund the difference."}
+        - {anchor: the-atomic-gate, say: "The heart of it — a single atomic update with the quota check in the where clause. Two concurrent requests can never both pass the gate on the same credits."}
+        - {anchor: estimate-vs-actual, say: "Measured on the real model: the chat template makes prompt counts run about thirty tokens above a naive heuristic. That's why prompt overhead exists."}
+        - {anchor: example-a-reserve-then-refund, say: "Example A: estimate one nine five, reserve it, actual comes in at one zero five, settle and refund ninety."}
+        - {anchor: example-b-over-quota-at-settle-estimate-actual, say: "Example B, the interesting one: reserve fifty-five, actual overshoots to sixty-five. We charge the truth, go five negative, and gate the next request. A deliberate tradeoff."}
+        - {anchor: failure-handling, say: "Every exit path settles — fail before usage, fail after partial usage, or a crash, where a sweeper reclaims the orphaned hold."}
+
+  - terminal:
+      name: Tests, demo & benchmarks
+      cwd: *proj
+      title: "terrabase-metering — make"
+      steps:
+        - {run: ["make", "verify"], say: "The quality gate: fifty-six tests, ninety-five percent coverage, ruff and mypy clean."}
+        - {run: ["./demo.sh"], env: {PAUSE: "0"}, say: "A scripted walkthrough — it boots its own server against a throwaway database, so the numbers are identical every run."}
+        - {run: ["make", "bench-concurrency"], say: "The no-oversell proof: ten, a hundred, then five hundred concurrent requests against a quota that fits exactly five."}
+
+  - app:
+      name: Live dashboard (real model)
+      cwd: *proj
+      start: ["uv", "run", "uvicorn", "app.main:app", "--port", "8055", "--log-level", "warning"]
+      env: {GENERATOR: ollama, PROMPT_OVERHEAD: "30", DATABASE_URL: "sqlite+aiosqlite:///./_repocast_demo.db"}
+      url: "http://127.0.0.1:8055"
+      ready_path: /health
+      zoom: 1.4
+      actions:
+        - {say: "And here it is running for real, against a local qwen model."}
+        - {click: '.rolebtn[data-role="admin"]'}
+        - {click: '.tabbtn[data-tab="settings"]'}
+        - {fill: '#cfg_quota', value: "600"}
+        - {fill: '#cfg_mult', value: "1.5"}
+        - {click: 'button[onclick="createConfig()"]'}
+        - {say: "Configuring a user: quota six hundred, multiplier one point five."}
+        - {click: '.tabbtn[data-tab="playground"]'}
+        - {fill: '#max_tokens', value: "48"}
+        - {fill: '#prompt', value: "In one sentence, what is a credit metering service?"}
+        - {say: "A real prompt — the model streams token by token and the meter moves live."}
+        - {click: '#send_btn'}
+        - {wait_for: '.msg.assistant .meta', timeout: 180000}
+        - {click: '.tabbtn[data-tab="usage"]'}
+        - {say: "The ledger: estimate versus actual, and the refund. Example A, on a real model."}
+        - {say: "Finally, quota enforcement — a request that costs more than the balance is refused with a 402, before the model ever runs."}

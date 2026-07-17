@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+_repocast/
+_recording/
+voice_samples/
+*.mp4
+*.webm
+NARRATION.md
+.venv/
+dist/
+*.egg-info/

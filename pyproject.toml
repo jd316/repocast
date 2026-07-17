@@ -1,0 +1,34 @@
+[project]
+name = "repocast"
+version = "0.1.0"
+description = "Generate a narrated walkthrough video (docs + terminal + live app) of any code project, with AI voice-over. No screen recording."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "Joydip Biswas" }]
+keywords = ["demo", "walkthrough", "video", "screencast", "tts", "playwright", "documentation", "onboarding"]
+dependencies = [
+    "pyyaml>=6",
+    "playwright>=1.40",
+    "markdown>=3.5",
+]
+
+[project.urls]
+Homepage = "https://github.com/jd316/repocast"
+Issues = "https://github.com/jd316/repocast/issues"
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[project.scripts]
+repocast = "repocast.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["repocast"]
+
+[tool.ruff]
+line-length = 100
