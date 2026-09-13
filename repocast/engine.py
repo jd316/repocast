@@ -275,8 +275,10 @@ _DEMO_LAYER = """
   const style = document.createElement('style');
   style.textContent = `
     #__repocast_layer{position:fixed;inset:0;z-index:2147483647;pointer-events:none}
-    .__repocast_cursor{position:absolute;width:18px;height:18px;background:#fff;border:3px solid #2563eb;
-      border-radius:50%;box-shadow:0 2px 8px #0008;transform:translate(-50%,-50%);transition:left .28s ease,top .28s ease}
+    .__repocast_cursor{position:absolute;width:18px;height:18px;background:#fff;
+      clip-path:polygon(0 0,0 82%,24% 62%,42% 100%,55% 93%,37% 58%,68% 58%);
+      filter:drop-shadow(0 1px 1px #000) drop-shadow(0 2px 4px #0008);
+      transition:left .28s ease,top .28s ease}
     .__repocast_focus{position:absolute;border:4px solid #60a5fa;border-radius:10px;
       box-shadow:0 0 0 9999px #0004,0 0 24px #60a5fa;transition:all .25s ease}
     .__repocast_note{position:absolute;max-width:360px;padding:12px 16px;border-radius:10px;
@@ -319,7 +321,7 @@ def _configure_cursor(page, cursor: dict) -> None:
       const el=document.querySelector('.__repocast_cursor');
       const size=c.size||18;
       el.style.width=size+'px';el.style.height=size+'px';
-      el.style.borderColor=c.color||'#2563eb';
+      el.style.backgroundColor=c.color||'#fff';
       el.style.transitionDuration=(c.smoothing??.28)+'s';
       el.style.filter=c.blur?`blur(${c.blur}px)`:'';
     }""",

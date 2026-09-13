@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.2
+
+- Replaced the circular browser cursor overlay with a recognizable mouse pointer and
+  made `cursor.color` style the pointer correctly.
+
 ## 0.2.1
 
 - Aligned the README, CLI, package, plugin, marketplace, release, and repository
