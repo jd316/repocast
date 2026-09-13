@@ -1,7 +1,7 @@
 [project]
 name = "repocast"
 version = "0.2.0"
-description = "Agent-operated demo compiler for narrated docs, terminal, browser, and media walkthroughs."
+description = "General-purpose, agent-operated demo video maker for products, software workflows, code, docs, and media."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"

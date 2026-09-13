@@ -1,8 +1,8 @@
 ---
 name: repocast
 description: >
-  Create a local narrated technical demo from real project behavior. Use for product
-  demos, code walkthroughs, CLI/API demos, bug reproductions, release videos,
+  Create a local narrated product or technical demo from real project behavior. Use for
+  product demos, software workflows, code walkthroughs, CLI/API demos, bug reproductions, release videos,
   onboarding, benchmarks, take-home submissions, or requests mentioning repocast.
   Produces MP4/GIF, narration, optional captions, and verification JSON.
 metadata:

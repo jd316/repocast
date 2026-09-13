@@ -1,12 +1,13 @@
 # repocast
 
-**Ask a coding agent to make a technical demo. Repocast compiles its reproducible
-instructions into a polished, narrated video.**
+**Ask a coding agent to make a product or technical demo. Repocast turns its
+reproducible instructions into a polished, narrated video.**
 
-Repocast turns a source-controlled `walkthrough.yaml` into an MP4 or GIF. A demo can
-combine rendered documentation, real terminal commands, a live browser application,
-screenshots, diagrams, and existing video. Narration is paced from measured speech,
-with optional captions and a machine-readable verification report.
+Repocast is a general-purpose, agent-operated demo video maker. It turns a
+source-controlled `walkthrough.yaml` into an MP4 or GIF combining product workflows,
+rendered documentation, real terminal commands, browser interactions, screenshots,
+diagrams, and existing footage. Narration is paced from measured speech, with optional
+captions and a machine-readable verification report.
 
 It is designed for Claude Code, Codex, and other coding agents: the agent understands
 the project and writes the story; the CLI executes and records it deterministically.

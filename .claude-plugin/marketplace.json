@@ -1,12 +1,12 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "repocast",
-  "description": "Agent-operated technical demos — docs, terminal, browser, and media with narration.",
+  "description": "General-purpose, agent-operated product and technical demo videos.",
   "owner": { "name": "Joydip Biswas", "url": "https://github.com/jd316" },
   "plugins": [
     {
       "name": "repocast",
-      "description": "Compile an agent-authored technical demo into a narrated MP4 or GIF.",
+      "description": "Make an agent-authored product or technical demo as a narrated MP4 or GIF.",
       "source": "./",
       "category": "productivity",
       "author": { "name": "Joydip Biswas", "url": "https://github.com/jd316" },

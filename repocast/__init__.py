@@ -1,4 +1,4 @@
-"""repocast — compile agent-authored technical demos into narrated video.
+"""repocast — make agent-authored product and technical demo videos.
 
 Docs, terminal, browser, and media scenes driven by a walkthrough.yaml.
 """

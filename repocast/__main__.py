@@ -612,7 +612,8 @@ def cmd_dry_run(args) -> None:
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(
-        prog="repocast", description="Compile reproducible technical demos into polished video."
+        prog="repocast",
+        description="Make reproducible product and technical demos into polished video.",
     )
     p.add_argument("--version", action="version", version=f"repocast {__version__}")
     sub = p.add_subparsers(dest="cmd", required=True)

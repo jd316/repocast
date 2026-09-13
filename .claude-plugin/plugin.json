@@ -1,7 +1,7 @@
 {
   "name": "repocast",
   "version": "0.2.0",
-  "description": "Compile agent-authored docs, terminal, browser, and media demos into narrated video.",
+  "description": "Make agent-authored product and technical demo videos from workflows, code, docs, and media.",
   "author": { "name": "Joydip Biswas", "url": "https://github.com/jd316" },
   "homepage": "https://github.com/jd316/repocast",
   "repository": "https://github.com/jd316/repocast",
