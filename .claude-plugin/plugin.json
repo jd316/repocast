@@ -1,6 +1,6 @@
 {
   "name": "repocast",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Make agent-authored product and technical demo videos from workflows, code, docs, and media.",
   "author": { "name": "Joydip Biswas", "url": "https://github.com/jd316" },
   "homepage": "https://github.com/jd316/repocast",

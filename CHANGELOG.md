@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+
+- Aligned the README, CLI, package, plugin, marketplace, release, and repository
+  descriptions around Repocast's general-purpose product and technical demo scope.
+
 ## 0.2.0
 
 - Generalized walkthroughs with document, terminal, browser, image, GIF, and video scenes.
