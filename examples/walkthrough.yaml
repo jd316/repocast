@@ -3,8 +3,19 @@
 # Render:  repocast render examples/walkthrough.yaml
 # Validate: repocast validate examples/walkthrough.yaml
 
-output: walkthrough.mp4          # written next to this config
-size: [1920, 1080]               # match your screen / target upload resolution
+output: walkthrough.mp4          # .mp4 or .gif, written next to this config
+size: youtube                    # youtube | portrait | square | [width, height]
+captions: true                   # writes walkthrough.srt; may also be a .srt/.vtt path
+burn_captions: true              # makes captions visible in the exported video
+
+theme:
+  background: "#111827"
+  padding: 36
+  radius: 16
+  shadow: true
+
+video: {crf: 21, fps: 30, preset: slow}
+quality: {loudness_target: -16, loudness_tolerance: 2}
 
 tts:
   provider: gemini               # gemini | none  (none = silent video, use your own voice)
@@ -46,9 +57,17 @@ segments:
       zoom: 1.4
       actions:
         - {say: "And here it is running for real."}
-        - {click: '#some-button'}
-        - {fill: '#some-input', value: "hello"}
+        - {click: '#some-button', focus: true, effect: ripple}
+        - {fill: '#some-input', value: "hello", focus: true}
         - {say: "Submitting a request…"}
         - {click: '#submit'}
         - {wait_for: '.result', timeout: 60000}
+        - annotate: {target: '.result', text: "Live result"}
         - {say: "…and the result comes back."}
+
+  # 4) Images, animated GIFs, and existing video can join the same narrated output.
+  # - media:
+  #     file: architecture.png
+  #     duration: 5
+  #     fade: 0.25
+  #     say: "The same demo can include generated diagrams and existing footage."

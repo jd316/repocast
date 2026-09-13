@@ -1,78 +1,107 @@
 ---
 name: repocast
 description: >
-  Generate a narrated walkthrough MP4 of a code project — design doc + real
-  terminal output + the live app driven in a browser — with AI voice-over, and
-  NO manual screen recording or terminal emulator needed. Use when the user wants
-  to "make a demo/walkthrough video", "record a walkthrough", "make a Loom/Jam for
-  this project", produce a narrated video of their repo (for a take-home submission,
-  README, onboarding, or OSS intro), or types /repocast. Outputs an MP4 with baked-in
-  narration plus a timestamped NARRATION.md.
+  Create a local narrated technical demo from real project behavior. Use for product
+  demos, code walkthroughs, CLI/API demos, bug reproductions, release videos,
+  onboarding, benchmarks, take-home submissions, or requests mentioning repocast.
+  Produces MP4/GIF, narration, optional captions, and verification JSON.
 metadata:
   type: workflow
 ---
 
-# repocast — narrated project walkthrough video
+# Repocast demo workflow
 
-Turns a `walkthrough.yaml` into a 1080p narrated MP4. The user uploads the result
-(YouTube/Loom/Jam); nothing is screen-recorded by hand.
+Repocast is the deterministic renderer; you are the planner. Inspect the target project,
+choose the shortest coherent story, express it in YAML, execute it, and inspect the local
+result. Do not upload or publish the output unless the user explicitly asks.
 
-**Install the `repocast` CLI once — the skill drives it:**
+## Prerequisites
+
 ```bash
-uv tool install git+https://github.com/jd316/repocast   # puts `repocast` on PATH
-playwright install chrome                                # one-time browser download
+uv tool install git+https://github.com/jd316/repocast
+playwright install chrome
 ```
-Then every command below is just `repocast …`. If `repocast` isn't found, install it
-with the line above (or, from a source checkout, run
-`uv run --with pyyaml --with playwright --with markdown python3 -m repocast …`).
-Config `file`/`cwd` paths resolve relative to the config file, so the `walkthrough.yaml`
-can live next to the target project and you can run `repocast` from anywhere.
 
-## Workflow when a user asks for a walkthrough video
-1. **Understand the project**: read its README/design doc, find the test/demo commands
-   (`make`, npm scripts, etc.), and how the app starts + its health URL and port.
-2. **Scaffold the config** next to (not inside) the project: `repocast init walkthrough.yaml`,
-   then fill in the three optional segment types — `doc`, `terminal`, `app` (schema below).
-3. **Validate**: `repocast validate walkthrough.yaml`.
-4. **Pick a voice**: `repocast voices` writes sample clips; the USER chooses (you can't
-   judge a voice by ear).
-5. **Render**:
-   ```bash
-   export GEMINI_API_KEY=...   # AI Studio key; x-goog-api-key header (newer keys are AQ.-prefixed)
-   repocast render walkthrough.yaml
-   ```
-   Flags: `--no-voice` (silent, bring your own), `--voice Orus`, `--output path.mp4`.
-6. **Verify** (auto after render, or `repocast verify out.mp4`): audio present + is speech,
-   cue alignment. Then SPOT-CHECK A FRAME by eye (`ffmpeg -ss <t> -i out.mp4 -frames:v 1
-   f.png`) — automated freeze checks (md5/freezedetect) LIE about held frames.
+From a source checkout, use `uv run python -m repocast`. FFmpeg and FFprobe must be on
+`PATH`. Voice generation needs `GEMINI_API_KEY`; use `--no-voice` when it is unavailable
+or when the user will narrate.
 
-## Config schema (walkthrough.yaml)
+## Required workflow
+
+1. Read the project instructions, README, package/build files, and relevant code.
+2. Find real test, CLI, API, and app-start commands. Never invent successful output.
+3. Decide the audience and tell one story. Prefer 3–7 scenes and under two minutes unless
+   the user requests something longer.
+4. Run `repocast schema` and create `walkthrough.yaml` beside the target project.
+5. Run `repocast validate walkthrough.yaml --json`.
+6. Run `repocast dry-run walkthrough.yaml --json`. Repair failed commands, startup,
+   anchors, and selectors before recording.
+7. Run `repocast render walkthrough.yaml --json` (plus `--no-voice` when appropriate).
+8. Read the JSON result and verification report. Extract representative frames with
+   FFmpeg and inspect them visually. Repair clipping, unreadable text, stale overlays,
+   awkward timing, or incorrect narration, then render again.
+9. Return the local paths and a concise description of what the video proves.
+
+Preserve failed render scratch files until the failure is understood. Never use
+`allow_failure: true` merely to make a broken demo pass; it is only for deliberately
+demonstrating an error path.
+
+## Story selection
+
+| User intent | Composition |
+|---|---|
+| Code walkthrough | `doc` → `terminal` → `app` |
+| CLI/API demo | `terminal`, optionally followed by `app` |
+| Product demo | `app` with focus, click effects, and annotations |
+| Bug reproduction | `app`/`terminal` actions that visibly reproduce the behavior |
+| Release demo | short `doc` context followed by the changed behavior |
+| Architecture/slides | `doc` and generated diagrams through `media` |
+| Existing footage | `media`, optionally with narration, trim, fade, and audio |
+| Before/after | two explicitly named segments with the same framing |
+
+## Configuration essentials
+
+Paths resolve relative to the YAML file. Use `repocast schema` as the current contract.
+
 ```yaml
-output: walkthrough.mp4
-size: [1920, 1080]              # match the user's screen / upload target
+output: demo.mp4
+size: youtube
+captions: true
+burn_captions: true
+theme: {background: "#111827", padding: 36, radius: 16, shadow: true}
+video: {crf: 21, fps: 30, preset: slow}
+quality: {loudness_target: -16, loudness_tolerance: 2}
 tts: {provider: gemini, voice: Charon, model: gemini-3.1-flash-tts-preview}
 segments:
-  - doc:      {file: DESIGN.md, steps: [{anchor: <heading-id>, say: "..."}]}
-  - terminal: {cwd: ., title: "proj — make", steps: [{run: ["make","test"], env: {}, say: "..."}]}
-  - app:      {cwd: ., start: ["make","run"], url: "http://127.0.0.1:8000", ready_path: /health,
-               zoom: 1.4, actions: [{say: "..."}, {click: "#x"}, {fill: "#y", value: "z"},
-                                    {wait_for: ".done", timeout: 60000}]}
+  - doc:
+      file: DESIGN.md
+      steps: [{anchor: architecture, say: "The design has three layers."}]
+  - terminal:
+      cwd: .
+      steps: [{run: ["pytest", "-q"], say: "The real tests pass."}]
+  - app:
+      cwd: .
+      start: ["npm", "run", "dev"]
+      url: http://127.0.0.1:3000
+      ready_path: /
+      actions:
+        - {fill: "#email", value: "demo@example.com", focus: true}
+        - {click: "#submit", focus: true, effect: ripple}
+        - {wait_for: ".result"}
+        - annotate: {target: ".result", text: "Real response"}
+        - check: {no_scroll: true, min_font_size: 18, required_text: ["Real response"]}
+        - {say: "The result comes from the running application."}
+  - media: {file: architecture.png, duration: 5, say: "The architecture at a glance."}
 ```
-App action verbs: `say`, `click`, `fill`(+`value`), `wait_for`(+`timeout`), `press`, `goto`,
-`eval`, `sleep`. Doc `anchor`s are rendered-markdown heading IDs (lowercase, spaces→hyphens) —
-render errors LOUDLY on a wrong anchor, so a typo won't silently drop a section.
 
-## Non-obvious rules (baked into the engine — don't fight them)
-- **Audio-first pacing**: narration is synthesised and MEASURED first; every on-screen hold
-  is ≥ the spoken line. Never overlay TTS on a fixed video (drifts).
-- **TTS model `gemini-3.1-flash-tts-preview`**: the 2.5 TTS models return `finishReason:OTHER`
-  with no audio for some texts under a style prefix. The engine pre-flights all lines (fail
-  fast) and falls back to bare text.
-- **No terminal emulator?** The terminal segment renders captured stdout as HTML and films it.
-- **Never hardcode narration numbers that differ per backend** (mock vs real model); describe
-  behavior or read from the live response.
+App action verbs are `say`, `click`, `fill`, `wait_for`, `press`, `goto`, `eval`,
+`sleep`, `annotate`, and `check`. Use exactly one verb per action. Prefer stable IDs, roles, or
+test IDs over fragile CSS ancestry selectors.
 
-## For a hiring/take-home submission
-The "explain your tradeoffs" criterion is about the candidate's own communication. Offer the
-user `NARRATION.md` to record in their own voice (render with `tts.provider: none` for a
-silent video to narrate over).
+Narration must describe what is visible and remain true across environments. Do not
+hardcode variable counts or timings. Repocast measures speech first; do not add manual
+sleeps to approximate narration duration.
+
+Use imported audio, webcam overlays, GIF output, trimming, fades, or cursor styling only
+when they improve the requested story. Avoid turning a concise technical demo into a
+feature tour.

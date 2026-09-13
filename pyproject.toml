@@ -1,12 +1,12 @@
 [project]
 name = "repocast"
-version = "0.1.0"
-description = "Generate a narrated walkthrough video (docs + terminal + live app) of any code project, with AI voice-over. No screen recording."
+version = "0.2.0"
+description = "Agent-operated demo compiler for narrated docs, terminal, browser, and media walkthroughs."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 authors = [{ name = "Joydip Biswas" }]
-keywords = ["demo", "walkthrough", "video", "screencast", "tts", "playwright", "documentation", "onboarding"]
+keywords = ["agent", "demo", "walkthrough", "video", "tts", "playwright", "documentation", "onboarding"]
 dependencies = [
     "pyyaml>=6",
     "playwright>=1.40",
@@ -18,7 +18,7 @@ Homepage = "https://github.com/jd316/repocast"
 Issues = "https://github.com/jd316/repocast/issues"
 
 [dependency-groups]
-dev = ["pytest>=8", "ruff>=0.6"]
+dev = ["jsonschema>=4", "playwright>=1.40", "pyright>=1.1", "pytest>=8", "ruff>=0.6"]
 
 [project.scripts]
 repocast = "repocast.__main__:main"
@@ -32,3 +32,7 @@ packages = ["repocast"]
 
 [tool.ruff]
 line-length = 100
+
+[tool.pyright]
+include = ["repocast", "tests"]
+pythonVersion = "3.10"

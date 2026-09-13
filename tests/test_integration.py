@@ -4,6 +4,7 @@ work dir containing the pre-generated voice clips, so the mux found no audio).
 Gated on real deps (Gemini key, ffmpeg, Chrome), so it's a local/integration
 check, not part of the credential-free unit run.
 """
+
 import os
 import shutil
 import subprocess
@@ -31,14 +32,29 @@ def test_voiced_render_has_audio(tmp_path):
     out = tmp_path / "out.mp4"
     r = subprocess.run(
         ["repocast", "render", str(cfg), "--output", str(out), "--no-verify"],
-        capture_output=True, text=True, timeout=300,
+        capture_output=True,
+        text=True,
+        timeout=300,
+        check=False,
     )
     assert r.returncode == 0, r.stderr
     assert out.is_file()
     # the bug: mux failed -> no audio stream. Assert one is present.
     codec = subprocess.run(
-        ["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries",
-         "stream=codec_name", "-of", "csv=p=0", str(out)],
-        capture_output=True, text=True,
+        [
+            "ffprobe",
+            "-v",
+            "error",
+            "-select_streams",
+            "a",
+            "-show_entries",
+            "stream=codec_name",
+            "-of",
+            "csv=p=0",
+            str(out),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
     ).stdout.strip()
     assert codec, "no audio stream — the TTS->render->mux path regressed"

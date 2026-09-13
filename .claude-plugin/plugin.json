@@ -1,7 +1,7 @@
 {
   "name": "repocast",
-  "version": "0.1.0",
-  "description": "Generate a narrated walkthrough video (design doc + terminal + live app) of any code project, with AI voice-over. No screen recording.",
+  "version": "0.2.0",
+  "description": "Compile agent-authored docs, terminal, browser, and media demos into narrated video.",
   "author": { "name": "Joydip Biswas", "url": "https://github.com/jd316" },
   "homepage": "https://github.com/jd316/repocast",
   "repository": "https://github.com/jd316/repocast",

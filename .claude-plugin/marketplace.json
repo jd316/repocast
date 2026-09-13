@@ -1,12 +1,12 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "repocast",
-  "description": "Narrated project walkthrough videos — docs + terminal + live app, with AI voice-over.",
+  "description": "Agent-operated technical demos — docs, terminal, browser, and media with narration.",
   "owner": { "name": "Joydip Biswas", "url": "https://github.com/jd316" },
   "plugins": [
     {
       "name": "repocast",
-      "description": "Generate a narrated walkthrough video of any code project (docs + terminal + live app) with AI voice-over. No screen recording.",
+      "description": "Compile an agent-authored technical demo into a narrated MP4 or GIF.",
       "source": "./",
       "category": "productivity",
       "author": { "name": "Joydip Biswas", "url": "https://github.com/jd316" },

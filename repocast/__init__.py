@@ -1,6 +1,6 @@
-"""repocast — generate a narrated walkthrough video of any code project.
+"""repocast — compile agent-authored technical demos into narrated video.
 
-Docs + terminal + live app, with AI voice-over, driven by a walkthrough.yaml.
-No manual screen recording, no terminal emulator required.
+Docs, terminal, browser, and media scenes driven by a walkthrough.yaml.
 """
-__version__ = "0.1.0"
+
+__version__ = "0.2.0"
